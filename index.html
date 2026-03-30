@@ -17,6 +17,10 @@ html{scroll-behavior:smooth}body{font-family:'Noto Sans KR',sans-serif;backgroun
 .stats-bar{display:flex;justify-content:center;align-items:center;gap:20px;flex-wrap:wrap;margin-top:26px;position:relative;z-index:1;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px 32px;max-width:280px}
 .stat-num{font-family:'Outfit',sans-serif;font-size:30px;font-weight:800;color:var(--red)}.stat-label{font-size:11px;color:var(--text2);letter-spacing:.5px}
 .filter-wrap{position:sticky;top:0;z-index:100;background:rgba(10,10,12,.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:12px 20px}
+.filter-wrap::after{content:'';position:absolute;right:0;top:0;bottom:0;width:50px;background:linear-gradient(to right,transparent,rgba(10,10,12,.95));pointer-events:none;z-index:2;transition:opacity .3s}.filter-wrap.scrolled-end::after{opacity:0}
+.scroll-hint{display:none;position:absolute;right:12px;top:50%;transform:translateY(-50%);z-index:3;font-size:11px;color:var(--text3);animation:hintBounce 1.5s ease infinite;pointer-events:none;white-space:nowrap;transition:opacity .3s}
+@keyframes hintBounce{0%,100%{transform:translateY(-50%) translateX(0)}50%{transform:translateY(-50%) translateX(4px)}}
+@media(max-width:768px){.scroll-hint{display:block}.filter-wrap{padding-right:70px}}
 .filter-scroll{display:flex;gap:8px;overflow-x:auto;max-width:1100px;margin:0 auto;scrollbar-width:none;-ms-overflow-style:none;padding-bottom:4px}.filter-scroll::-webkit-scrollbar{display:none}
 .filter-btn{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:50px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;font-family:'Noto Sans KR',sans-serif;white-space:nowrap}
 .filter-btn:hover{border-color:var(--text2);color:var(--text)}.filter-btn.active{background:var(--red);border-color:var(--red);color:#fff;font-weight:600}
@@ -111,7 +115,7 @@ html{scroll-behavior:smooth}body{font-family:'Noto Sans KR',sans-serif;backgroun
 <div class="stat"><div class="stat-num">9</div><div class="stat-label">카테고리</div></div>
 </div>
 </div>
-<div class="filter-wrap"><div class="filter-scroll" id="filterTabs"></div></div>
+<div class="filter-wrap" id="filterWrap"><div class="filter-scroll" id="filterTabs"></div><span class="scroll-hint" id="scrollHint">더보기 ›</span></div>
 <div class="search-wrap"><div class="search-container"><span class="search-icon">🔍</span><input class="search-box" type="text" placeholder="기능 검색 (예: 음성, 충전, 공조...)" id="searchInput"></div></div>
 <div class="ota-banner" id="otaBanner"></div>
 <div class="sort-wrap">
@@ -422,6 +426,13 @@ await loadData();
 if(!features.length)features=[...DEFAULT_FEATURES];
 updateStats();renderFilters();renderContent();renderOtaBanner();
 document.getElementById('searchInput').oninput=e=>{searchTerm=e.target.value.toLowerCase().trim();renderContent()};
+const filterScroll=document.getElementById('filterTabs');
+const scrollHint=document.getElementById('scrollHint');
+const filterWrap=document.getElementById('filterWrap');
+filterScroll.addEventListener('scroll',()=>{
+if(filterScroll.scrollLeft>10&&scrollHint){scrollHint.style.opacity='0';setTimeout(()=>{scrollHint.style.display='none'},300)}
+if(filterScroll.scrollLeft+filterScroll.clientWidth>=filterScroll.scrollWidth-10){filterWrap.classList.add('scrolled-end')}else{filterWrap.classList.remove('scrolled-end')}
+},{passive:true});
 document.getElementById('adminToggle').onclick=openAdmin;
 document.getElementById('adminClose').onclick=closeAdmin;
 document.getElementById('adminOverlay').onclick=e=>{if(e.target===e.currentTarget)closeAdmin()};
