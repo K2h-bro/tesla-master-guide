@@ -40,7 +40,9 @@ html{scroll-behavior:smooth}body{font-family:'Noto Sans KR',sans-serif;backgroun
 .card:hover{border-color:var(--red);transform:translateY(-1px);box-shadow:0 6px 24px rgba(232,33,39,.06)}
 .card.expanded{border-color:var(--red);box-shadow:0 4px 20px rgba(232,33,39,.08)}
 .card-top{display:flex;align-items:flex-start;gap:10px}
-.card-num{font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;color:var(--red);background:var(--red-dim);min-width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.card-num{font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;color:var(--text3);background:var(--surface2);min-width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.card-num.top10{color:#d4a017;background:rgba(212,160,23,.15);border:1px solid rgba(212,160,23,.3)}
+.card-num.mid{color:var(--red);background:var(--red-dim)}
 .card-title{font-size:14px;font-weight:700;line-height:1.4;flex:1}
 .card-new{font-size:10px;background:var(--green);color:#000;padding:2px 6px;border-radius:4px;font-weight:700;letter-spacing:.5px;flex-shrink:0}
 .card-verified{font-size:9px;background:var(--blue-dim);color:var(--blue);padding:2px 5px;border-radius:4px;font-weight:600;flex-shrink:0}
@@ -175,15 +177,15 @@ function initThemeToggle(){
 }
 document.addEventListener('DOMContentLoaded',initThemeToggle);
 const CATEGORIES=[
-{id:"all",name:"전체보기",icon:"🚗",color:"--red"},
+{id:"all",name:"전체보기",icon:"⚡",color:"--red"},
 {id:"display",name:"디스플레이 & UI",icon:"🖥️",color:"--blue"},
-{id:"climate",name:"공조 & 온도",icon:"❄️",color:"--cyan"},
-{id:"driving",name:"주행 & 조작",icon:"🏎️",color:"--red"},
+{id:"climate",name:"공조 & 온도",icon:"🌡️",color:"--cyan"},
+{id:"driving",name:"주행 & 조작",icon:"🚦",color:"--red"},
 {id:"nav",name:"네비 & 경로",icon:"🗺️",color:"--green"},
 {id:"app",name:"모바일 앱",icon:"📱",color:"--purple"},
 {id:"charge",name:"충전 & 배터리",icon:"🔋",color:"--amber"},
-{id:"comfort",name:"편의 & 수납",icon:"💺",color:"--blue"},
-{id:"fun",name:"이스터에그 & 재미",icon:"🎮",color:"--pink"},
+{id:"comfort",name:"편의 & 수납",icon:"🧳",color:"--blue"},
+{id:"fun",name:"이스터에그 & 재미",icon:"🎪",color:"--pink"},
 {id:"safety",name:"안전 & 관리",icon:"🛡️",color:"--green"}
 ];
 
@@ -256,7 +258,34 @@ const COMPAT_OPTIONS=["전 모델","Y 주니퍼","3 하이랜드 · Y 주니퍼"
 
 const TAG_MAP={screen:{label:'터치스크린',cls:'tag-screen'},app:{label:'모바일앱',cls:'tag-app'},voice:{label:'음성명령',cls:'tag-voice'},physical:{label:'물리조작',cls:'tag-physical'},easter:{label:'이스터에그',cls:'tag-easter'},juniper:{label:'NEW',cls:'tag-juniper'}};
 
-let features=[...DEFAULT_FEATURES];
+// 실제 테슬라 오너 활용 빈도 기준 우선순위 정렬 순서
+const FEATURE_PRIORITY_ORDER=[
+  // 1~10: 매일 쓰는 핵심 기능
+  "f15","f34","f11","f56","f59","f58","f27","f38","f19","f54",
+  // 11~20: 자주 쓰는 유용한 기능
+  "f18","f7","f10","f26","f40","f9","f16","f35","f43","f33",
+  // 21~30: 알아두면 좋은 기능
+  "f23","f5","f20","f17","f29","f19b","f32","f44","f36","f31",
+  // 31~40: 편의 기능
+  "f21","f24","f1","f2","f42","f13","f14","f25","f28","f30",
+  // 41~46: 긴급·고급 기능
+  "f22","f37","f57","f53","f55","f3",
+  // 47~54: 신형 모델 전용 기능
+  "f6","f60","f4","f8","f45","f41","f61","f12",
+  // 55~62: 이스터에그 & 재미
+  "f39","f46","f48","f47","f50","f49","f51","f52"
+];
+function sortFeaturesByPriority(arr){
+  return [...arr].sort((a,b)=>{
+    const ai=FEATURE_PRIORITY_ORDER.indexOf(a.id);
+    const bi=FEATURE_PRIORITY_ORDER.indexOf(b.id);
+    if(ai===-1&&bi===-1)return 0;
+    if(ai===-1)return 1;
+    if(bi===-1)return -1;
+    return ai-bi;
+  });
+}
+let features=sortFeaturesByPriority(DEFAULT_FEATURES);
 let activeFilter='all';
 let searchTerm='';
 let adminTab='add';
@@ -266,7 +295,7 @@ let changelog=[];
 
 // Storage
 async function loadData(){
-try{const r=await window.storage.get('tesla-features');if(r&&r.value){features=JSON.parse(r.value)}}catch(e){features=[...DEFAULT_FEATURES]}
+try{const r=await window.storage.get('tesla-features');if(r&&r.value){features=sortFeaturesByPriority(JSON.parse(r.value))}}catch(e){features=sortFeaturesByPriority(DEFAULT_FEATURES)}
 try{const r=await window.storage.get('tesla-changelog');if(r&&r.value){changelog=JSON.parse(r.value)}}catch(e){changelog=[]}
 }
 async function saveData(){try{await window.storage.set('tesla-features',JSON.stringify(features))}catch(e){}}
@@ -317,7 +346,8 @@ card.querySelector('.card-top').addEventListener('click',()=>card.classList.togg
 function renderCard(f){
 const idx=features.indexOf(f)+1;
 const isLimited=f.compat&&f.compat!=='전 모델';
-return `<div class="card"><div class="card-top"><div class="card-num">${idx}</div><div class="card-title">${f.title}</div>${f.isNew?'<span class="card-new">NEW</span>':''}<span class="card-verified">✅</span><span class="card-expand-icon">▾</span></div><div class="card-detail"><div class="card-how">${f.how||''}</div><div class="card-compat ${isLimited?'limited':''}">호환: ${f.compat||'전 모델'}</div><div class="card-tags">${f.tags.map(t=>{const info=TAG_MAP[t]||{label:t,cls:''};return `<span class="tag ${info.cls}">${info.label}</span>`}).join('')}</div></div></div>`;
+const numClass=idx<=10?'card-num top10':idx<=30?'card-num mid':'card-num';
+return `<div class="card"><div class="card-top"><div class="${numClass}">${idx}</div><div class="card-title">${f.title}</div>${f.isNew?'<span class="card-new">NEW</span>':''}<span class="card-expand-icon">▾</span></div><div class="card-detail"><div class="card-how">${f.how||''}</div><div class="card-compat ${isLimited?'limited':''}">호환: ${f.compat||'전 모델'}</div><div class="card-tags">${f.tags.map(t=>{const info=TAG_MAP[t]||{label:t,cls:''};return `<span class="tag ${info.cls}">${info.label}</span>`}).join('')}</div></div></div>`;
 }
 
 function renderCatSection(cat,items){
