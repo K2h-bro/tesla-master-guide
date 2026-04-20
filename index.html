@@ -128,10 +128,9 @@ html{scroll-behavior:smooth}body{font-family:'Noto Sans KR',sans-serif;backgroun
 <div class="ota-banner" id="otaBanner"></div>
 <div class="sort-wrap">
 <span class="sort-label">정렬:</span>
-<button class="sort-btn active" data-sort="default">기본순</button>
-<button class="sort-btn" data-sort="new">🆕 NEW 먼저</button>
-<button class="sort-btn" data-sort="compat">🚘 호환 제한</button>
-<button class="sort-btn" data-sort="alpha">ㄱㄴㄷ순</button>
+<button class="sort-btn active" data-sort="default">🏆 추천순</button>
+<button class="sort-btn" data-sort="new">🆕 최신 업데이트</button>
+<button class="sort-btn" data-sort="juniper">✨ 주니퍼·하이랜드 전용</button>
 </div>
 <div class="main" id="mainContent"></div>
 <div class="footer">Tesla Master Guide — Model S.3.X.Y ✅ 모든 기능 검증 완료<br><span style="color:#555">※ 소프트웨어 버전·모델에 따라 일부 기능이 다를 수 있습니다</span></div>
@@ -325,14 +324,13 @@ const sm=!searchTerm||f.title.toLowerCase().includes(searchTerm)||(f.how||'').to
 return cm&&sm;
 });
 if(sortMode==='new'){filtered=[...filtered].sort((a,b)=>(b.isNew?1:0)-(a.isNew?1:0))}
-else if(sortMode==='compat'){filtered=[...filtered].sort((a,b)=>{const al=a.compat&&a.compat!=='전 모델'?0:1;const bl=b.compat&&b.compat!=='전 모델'?0:1;return al-bl})}
-else if(sortMode==='alpha'){filtered=[...filtered].sort((a,b)=>a.title.localeCompare(b.title,'ko'))}
+else if(sortMode==='juniper'){filtered=filtered.filter(f=>f.tags.includes('juniper'))}
 const isSorted=sortMode!=='default';
 const grouped={};filtered.forEach(f=>{if(!grouped[f.cat])grouped[f.cat]=[];grouped[f.cat].push(f)});
 const order=CATEGORIES.filter(c=>c.id!=='all').map(c=>c.id);
 let html='';
 if(isSorted&&filtered.length){
-const sortLabel={new:'🆕 NEW 먼저',compat:'🚘 호환 제한 먼저',alpha:'ㄱㄴㄷ순'}[sortMode];
+const sortLabel={new:'🆕 최신 업데이트 기능',juniper:'✨ 주니퍼·하이랜드 전용 기능'}[sortMode];
 html+=`<div class="category-section"><div class="cat-header"><div class="cat-icon" style="background:var(--red-dim)">📋</div><div class="cat-title">${sortLabel}</div><div class="cat-count">${filtered.length}개</div></div><div class="cards-grid">${filtered.map(f=>renderCard(f)).join('')}</div></div>`;
 }else if(activeFilter!=='all'){const cat=CATEGORIES.find(c=>c.id===activeFilter);html+=renderCatSection(cat,grouped[activeFilter]||[])}
 else order.forEach(cid=>{if(grouped[cid]){const cat=CATEGORIES.find(c=>c.id===cid);html+=renderCatSection(cat,grouped[cid])}});
