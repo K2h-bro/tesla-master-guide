@@ -19,7 +19,7 @@ html{scroll-behavior:smooth}body{font-family:'Noto Sans KR',sans-serif;backgroun
 .stat-num{font-family:'Outfit',sans-serif;font-size:30px;font-weight:800;color:var(--red)}.stat-label{font-size:11px;color:var(--text2);letter-spacing:.5px}
 .filter-wrap{position:sticky;top:0;z-index:100;background:var(--filter-bg,rgba(10,10,12,.85));backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:12px 20px}
 :root.light .filter-wrap{--filter-bg:rgba(245,245,247,.92)}
-.filter-wrap::after{content:'';position:absolute;right:0;top:0;bottom:0;width:50px;background:linear-gradient(to right,transparent,rgba(10,10,12,.95));pointer-events:none;z-index:2;transition:opacity .3s}.filter-wrap.scrolled-end::after{opacity:0}
+.filter-wrap::after{content:'';position:absolute;right:0;top:0;bottom:0;width:40px;background:linear-gradient(to right,transparent,var(--filter-bg,rgba(10,10,12,.95)));pointer-events:none;z-index:2;transition:opacity .3s}.filter-wrap.scrolled-end::after{opacity:0}
 .scroll-hint{display:none;position:absolute;right:12px;top:50%;transform:translateY(-50%);z-index:3;font-size:11px;color:var(--text3);animation:hintBounce 1.5s ease infinite;pointer-events:none;white-space:nowrap;transition:opacity .3s}
 @keyframes hintBounce{0%,100%{transform:translateY(-50%) translateX(0)}50%{transform:translateY(-50%) translateX(4px)}}
 @media(max-width:768px){.scroll-hint{display:block}.filter-wrap{padding-right:70px}}
