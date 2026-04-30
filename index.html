@@ -303,7 +303,8 @@ function sortFeaturesByPriority(arr){
     return ai-bi;
   });
 }
-let features=sortFeaturesByPriority(DEFAULT_FEATURES);
+const DELETED_IDS=['f9','f10','f11','f15','f19','f20','f23','f24','f27','f34','f38','f43','f54','f56','f58','f59'];
+let features=sortFeaturesByPriority(DEFAULT_FEATURES.filter(f=>!DELETED_IDS.includes(f.id)));
 let activeFilter='all';
 let searchTerm='';
 let adminTab='add';
@@ -313,7 +314,7 @@ let changelog=[];
 
 // Storage
 async function loadData(){
-try{const r=await window.storage.get('tesla-features');if(r&&r.value){features=sortFeaturesByPriority(JSON.parse(r.value))}}catch(e){features=sortFeaturesByPriority(DEFAULT_FEATURES)}
+try{const r=await window.storage.get('tesla-features');if(r&&r.value){features=sortFeaturesByPriority(JSON.parse(r.value).filter(f=>!DELETED_IDS.includes(f.id)))}}catch(e){features=sortFeaturesByPriority(DEFAULT_FEATURES.filter(f=>!DELETED_IDS.includes(f.id)))}
 try{const r=await window.storage.get('tesla-changelog');if(r&&r.value){changelog=JSON.parse(r.value)}}catch(e){changelog=[]}
 }
 async function saveData(){try{await window.storage.set('tesla-features',JSON.stringify(features))}catch(e){}}
@@ -350,7 +351,7 @@ const order=CATEGORIES.filter(c=>c.id!=='all').map(c=>c.id);
 let html='';
 if(isSorted&&filtered.length){
 const sortLabel={new:'🆕 최신 업데이트 기능',juniper:'✨ 주니퍼·하이랜드 전용 기능'}[sortMode];
-html+=`<div class="category-section"><div class="cat-header"><div class="cat-icon" style="background:var(--red-dim)">📋</div><div class="cat-title">${sortLabel}</div><div class="cat-count">${filtered.length}개</div></div><div class="cards-grid">${filtered.map(f=>renderCard(f)).join('')}</div></div>`;
+html+=`<div class="category-section"><div class="cat-header"><div class="cat-icon" style="background:var(--red-dim)">📋</div><div class="cat-title">${sortLabel}</div><div class="cat-count">${filtered.length}개</div></div><div class="cards-grid">${filtered.map((f,i)=>renderCard(f,i+1)).join('')}</div></div>`;
 }else if(activeFilter!=='all'){const cat=CATEGORIES.find(c=>c.id===activeFilter);html+=renderCatSection(cat,grouped[activeFilter]||[])}
 else order.forEach(cid=>{if(grouped[cid]){const cat=CATEGORIES.find(c=>c.id===cid);html+=renderCatSection(cat,grouped[cid])}});
 if(!filtered.length)html=`<div style="text-align:center;padding:50px 20px;color:var(--text2)"><div style="font-size:40px;margin-bottom:12px">🔍</div>검색 결과가 없습니다</div>`;
@@ -360,16 +361,15 @@ card.querySelector('.card-top').addEventListener('click',()=>card.classList.togg
 });
 }
 
-function renderCard(f){
-const idx=features.indexOf(f)+1;
+function renderCard(f,idx){
 const isLimited=f.compat&&f.compat!=='전 모델';
-const numClass=idx<=10?'card-num top10':idx<=30?'card-num mid':'card-num';
-return `<div class="card"><div class="card-top"><div class="${numClass}">${idx}</div><div class="card-title">${f.title}</div>${f.isNew?'<span class="card-new">NEW</span>':''}<span class="card-expand-icon">▾</span></div><div class="card-detail"><div class="card-how">${f.how||''}</div><div class="card-compat ${isLimited?'limited':''}">호환: ${f.compat||'전 모델'}</div><div class="card-tags">${f.tags.map(t=>{const info=TAG_MAP[t]||{label:t,cls:''};return `<span class="tag ${info.cls}">${info.label}</span>`}).join('')}</div></div></div>`;
+return `<div class="card"><div class="card-top"><div class="card-num">${idx}</div><div class="card-title">${f.title}</div>${f.isNew?'<span class="card-new">NEW</span>':''}<span class="card-expand-icon">▾</span></div><div class="card-detail"><div class="card-how">${f.how||''}</div><div class="card-compat ${isLimited?'limited':''}">호환: ${f.compat||'전 모델'}</div><div class="card-tags">${f.tags.map(t=>{const info=TAG_MAP[t]||{label:t,cls:''};return `<span class="tag ${info.cls}">${info.label}</span>`}).join('')}</div></div></div>`;
 }
 
 function renderCatSection(cat,items){
+const sorted=[...items].sort((a,b)=>a.title.localeCompare(b.title,'ko'));
 const s=`background:var(${cat.color}-dim,var(--surface2))`;
-return `<div class="category-section"><div class="cat-header"><div class="cat-icon" style="${s}">${cat.icon}</div><div class="cat-title">${cat.name}</div><div class="cat-count">${items.length}개</div></div><div class="cards-grid">${items.map(f=>renderCard(f)).join('')}</div></div>`;
+return `<div class="category-section"><div class="cat-header"><div class="cat-icon" style="${s}">${cat.icon}</div><div class="cat-title">${cat.name}</div><div class="cat-count">${sorted.length}개</div></div><div class="cards-grid">${sorted.map((f,i)=>renderCard(f,i+1)).join('')}</div></div>`;
 }
 
 // Admin
