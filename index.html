@@ -523,7 +523,12 @@ document.getElementById('otaCard').addEventListener('click',()=>document.getElem
 // Init
 async function init(){
 await loadData();
-if(!features.length)features=[...DEFAULT_FEATURES];
+if(!features.length){features=[...DEFAULT_FEATURES];}else{
+// 저장된 데이터에 없는 DEFAULT_FEATURES 항목 자동 병합
+const savedIds=new Set(features.map(f=>f.id));
+const missing=DEFAULT_FEATURES.filter(f=>!savedIds.has(f.id));
+if(missing.length){features=sortFeaturesByPriority([...features,...missing]);saveData();}
+}
 updateStats();renderFilters();renderContent();renderOtaBanner();
 document.getElementById('searchInput').oninput=e=>{searchTerm=e.target.value.toLowerCase().trim();renderContent()};
 document.getElementById('adminToggle').onclick=openAdmin;
