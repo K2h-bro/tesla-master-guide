@@ -114,7 +114,7 @@ html{scroll-behavior:smooth}body{font-family:'Noto Sans KR',sans-serif;backgroun
   .hero{padding:20px 20px 14px;min-height:auto;gap:0}
   .company-logo-wrap{margin-bottom:10px;padding:0;background:none;border:none}
   .company-logo{height:28px;opacity:.88}
-  .company-logo-text{font-size:18px;letter-spacing:.28em}
+  .company-logo-dark{height:28px}
   .hero-title-group{margin-bottom:10px;display:flex;flex-direction:column;align-items:center;gap:6px}
   .hero-badge{margin-bottom:0;font-size:10px;padding:3px 10px;letter-spacing:.08em}
   .hero h1{font-size:clamp(1.7rem,7vw,2.2rem);line-height:1.08;white-space:normal;letter-spacing:-.02em}
@@ -134,8 +134,8 @@ html{scroll-behavior:smooth}body{font-family:'Noto Sans KR',sans-serif;backgroun
 .company-logo-wrap{display:inline-flex;align-items:center;justify-content:center;padding:0;background:none;border:none;margin-bottom:24px;position:relative;z-index:1}
 :root.light .company-logo-wrap{background:transparent;border-color:transparent;padding:0;margin-bottom:24px}
 .company-logo{height:42px;display:block}
-.company-logo-text{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;letter-spacing:.35em;color:#fff;text-transform:uppercase;display:none}
-:root:not(.light) .company-logo-text{display:block}
+.company-logo-dark{height:42px;display:none}
+:root:not(.light) .company-logo-dark{display:block}
 :root:not(.light) .company-logo{display:none}
 .hero-divider{width:40px;height:1px;background:var(--red);margin:14px auto 0;position:relative;z-index:1;opacity:.6}
 .cat-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;letter-spacing:.2px}
@@ -144,7 +144,7 @@ html{scroll-behavior:smooth}body{font-family:'Noto Sans KR',sans-serif;backgroun
 </head>
 <body>
 <div class="hero">
-<div class="company-logo-wrap"><img class="company-logo" src="https://smith.speedgabia.com/logo_data/the_smith_logo.png" alt="The Smith"><span class="company-logo-text">The Smith</span></div>
+<div class="company-logo-wrap"><img class="company-logo" src="https://smith.speedgabia.com/logo_data/the_smith_logo.png" alt="The Smith"><img class="company-logo-dark" src="the_smith_logo_dark.png" alt="The Smith"></div>
 <div class="hero-title-group">
 <div class="hero-badge">⚡ MODEL S.3.X.Y</div>
 <h1>Tesla <span class="accent">Master</span> Guide</h1>
